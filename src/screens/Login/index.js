@@ -6,12 +6,11 @@ import {
   View,
   TextInput,
   TouchableOpacity,
-  Alert,
 } from "react-native";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
-
-const baseUrl = "http://10.0.2.2:4000";
+import { userLogin } from "../../mobx/actions/AuthActions";
+import { storeToken } from "../../utils/storeToken";
 
 function Login() {
   const [phone, setPhone] = useState("");
@@ -19,7 +18,7 @@ function Login() {
   const [validationButton, setvalidationButton] = useState(false);
   const [isLoginError, setIsLoginError] = useState(false);
 
-  const navigation = useNavigation()
+  const navigation = useNavigation();
 
   useEffect(() => {
     if (phone.length >= 12 && password.length >= 6) {
@@ -28,40 +27,11 @@ function Login() {
   }, [phone, password]);
 
   function submit() {
-    console.log(phone, password);
-    axios
-      .post(`${baseUrl}/api/user/login`, {
-        phone: phone,
-        password: password,
-      })
-      .then((res) => {
-        if (res.status === 200) {
-          navigation.navigate("Home")
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        showAlert("Login Error", err);
-      });
+    const payload = { phone: phone, password: password };
+    const res = userLogin(payload);
+    storeToken(res);
+    navigation.navigate("HomeTabs");
   }
-
-  const showAlert = (title, message) => {
-    Alert.alert(
-      title,
-      message,
-      [
-        {
-          text: "Отмена",
-          style: "cancel",
-        },
-        {
-          text: "OK",
-          onPress: () => console.log("OK нажата"),
-        },
-      ],
-      { cancelable: false }
-    );
-  };
 
   return (
     <View style={styles.container}>

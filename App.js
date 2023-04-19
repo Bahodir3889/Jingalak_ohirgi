@@ -1,15 +1,19 @@
-import { StyleSheet, Text, View } from "react-native";
-
 import { NavigationContainer } from "@react-navigation/native";
 import RootNavigator from "./src/navigation";
 import { StatusBar } from "expo-status-bar";
+import UserStore from "./src/store/userStore";
+import { AppContext } from "./AppContext";
+
 
 export default function App() {
+  const appData = { user: new UserStore() };
   return (
-    <NavigationContainer>
-      <RootNavigator />
-      <StatusBar style="auto" />
-    </NavigationContainer>
+    <AppContext.Provider value={appData}>
+      <NavigationContainer>
+        <RootNavigator />
+        <StatusBar style="auto" />
+      </NavigationContainer>
+    </AppContext.Provider>
   );
 }
 
