@@ -7,17 +7,13 @@ import {
   TextInput,
   TouchableOpacity,
 } from "react-native";
-import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import { userLogin } from "../../mobx/actions/AuthActions";
-import { storeToken } from "../../utils/storeToken";
-
+import { saveToStore } from '../../utils/saveToStore';
 function Login() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [validationButton, setvalidationButton] = useState(false);
-  const [isLoginError, setIsLoginError] = useState(false);
-
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -29,7 +25,7 @@ function Login() {
   function submit() {
     const payload = { phone: phone, password: password };
     const res = userLogin(payload);
-    storeToken(res);
+    saveToStore("token",res);
     navigation.navigate("HomeTabs");
   }
 
@@ -55,6 +51,11 @@ function Login() {
       </View>
       <TouchableOpacity>
         <Text style={styles.forgot_button}>Forgot Password?</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={()=>{
+        navigation.navigate("Register")
+      }}>
+        <Text style={styles.forgot_button}>Register</Text>
       </TouchableOpacity>
       {validationButton && (
         <TouchableOpacity style={styles.loginBtn} onPress={submit}>

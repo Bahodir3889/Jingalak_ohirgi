@@ -8,9 +8,9 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import axios from "axios";
-
-const baseUrl = "http://10.0.2.2:4000";
+import { useNavigation } from "@react-navigation/native";
+import { userRegister } from "../../mobx/actions/AuthActions";
+import { saveToStore } from "../../utils/saveToStore";
 
 function Register() {
   const [name, setName] = useState("");
@@ -20,54 +20,27 @@ function Register() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [validationButton, setvalidationButton] = useState(false);
-  const [isLoginError, setIsLoginError] = useState(false);
+  const navigation = useNavigation();
   useEffect(() => {
     if (phone.length >= 12 && password.length >= 6) {
       setvalidationButton(true);
     }
   }, [phone, password]);
 
-  function submit() {
-    console.log(phone, password);
-    axios
-      .post(`${baseUrl}/api/user/register`, {
-        name: name,
-        age: age,
-        sex: sex,
-        region: region,
-        phone: phone,
-        password: password,
-      })
-      .then((res) => {
-        console.log(res);
-        if (res.status === 200) {
-          showAlert("Register", "Register successfull!");
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        showAlert("Register", err.message);
-      });
+  function submit(e) {
+    const payload = {
+      name: name,
+      age: age,
+      sex: sex,
+      region: region,
+      phone: phone,
+      password: password,
+    };
+    const res = userRegister(payload);
+    saveToStore("token",res.token)
+    saveToStore("profile",res.user)
+    navigation.navigate("Home");
   }
-
-  const showAlert = (title, message) => {
-    Alert.alert(
-      title,
-      message,
-      [
-        {
-          text: "Отмена",
-          style: "cancel",
-        },
-        {
-          text: "OK",
-          onPress: () => console.log("OK нажата"),
-        },
-      ],
-      { cancelable: false }
-    );
-  };
-
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
@@ -78,6 +51,7 @@ function Register() {
           placeholder="Name:"
           placeholderTextColor="#003f5c"
           onChangeText={(name) => setName(name)}
+          name="name"
         />
       </View>
 
@@ -125,7 +99,11 @@ function Register() {
           onChangeText={(password) => setPassword(password)}
         />
       </View>
-      <TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => {
+          navigation.navigate("Login");
+        }}
+      >
         <Text style={styles.forgot_button}>Alredy have accoutn? Login</Text>
       </TouchableOpacity>
       {validationButton && (

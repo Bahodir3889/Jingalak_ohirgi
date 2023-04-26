@@ -9,3 +9,12 @@ export const userLogin = async (payload) => {
     showAlert("Login error", err.response.data.message);
   }
 };
+
+export const userRegister = async (payload) => {
+  try {
+    const res = await api.userRegister(payload);
+    return res.data
+  } catch (err) {
+    showAlert("Register error", err.response.data.message);
+  }
+};
